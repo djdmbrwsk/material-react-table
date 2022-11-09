@@ -40,8 +40,8 @@ import type {
   TableOptions,
   TableState,
 } from '@tanstack/react-table';
-import type { Options as VirtualizerOptions, VirtualItem } from 'react-virtual';
-// import type { VirtualizerOptions } from '@tanstack/react-virtual';
+// import type { Options as VirtualizerOptions, VirtualItem } from 'react-virtual';
+import type { VirtualizerOptions, VirtualItem } from '@tanstack/virtual-core';
 import { MRT_AggregationFns } from './aggregationFns';
 import { MRT_DefaultColumn, MRT_DefaultDisplayColumn } from './column.utils';
 import { MRT_FilterFns } from './filterFns';
@@ -1038,20 +1038,20 @@ export type MaterialReactTableProps<TData extends Record<string, any> = {}> =
     selectAllMode?: 'all' | 'page';
     state?: Partial<MRT_TableState<TData>>;
     tableInstanceRef?: MutableRefObject<MRT_TableInstance<TData> | null>;
-    virtualizerProps?:
-      | Partial<VirtualizerOptions<HTMLDivElement>>
-      | (({
-          table,
-        }: {
-          table: MRT_TableInstance<TData>;
-        }) => Partial<VirtualizerOptions<HTMLDivElement>>);
     // virtualizerProps?:
-    //   | Partial<VirtualizerOptions<HTMLDivElement, HTMLTableRowElement>>
+    //   | Partial<VirtualizerOptions<HTMLDivElement>>
     //   | (({
     //       table,
     //     }: {
     //       table: MRT_TableInstance<TData>;
-    //     }) => Partial<VirtualizerOptions<HTMLDivElement, HTMLTableRowElement>>);
+    // }) => Partial<VirtualizerOptions<HTMLDivElement>>);
+    virtualizerProps?:
+      | Partial<VirtualizerOptions<HTMLDivElement, HTMLTableRowElement>>
+      | (({
+          table,
+        }: {
+          table: MRT_TableInstance<TData>;
+        }) => Partial<VirtualizerOptions<HTMLDivElement, HTMLTableRowElement>>);
     virtualizerInstanceRef?: MutableRefObject<Virtualizer | null>;
   };
 

@@ -1,6 +1,7 @@
 import React, { FC, memo, useMemo } from 'react';
-import { useVirtual } from 'react-virtual'; //stuck on v2 for now
-// import { useVirtualizer, Virtualizer } from '@tanstack/react-virtual';
+// import { useVirtual } from 'react-virtual'; //stuck on v2 for now
+import { useVirtualizer } from '@tanstack/react-virtual';
+import type { VirtualItem, Virtualizer } from '@tanstack/virtual-core';
 import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
 import { Memo_MRT_TableBodyRow, MRT_TableBodyRow } from './MRT_TableBodyRow';
@@ -25,7 +26,7 @@ export const MRT_TableBody: FC<Props> = ({ table }) => {
       manualSorting,
       memoMode,
       muiTableBodyProps,
-      virtualizerInstanceRef,
+      // virtualizerInstanceRef,
       virtualizerProps,
     },
     refs: { tableContainerRef, tablePaperRef },
@@ -73,49 +74,51 @@ export const MRT_TableBody: FC<Props> = ({ table }) => {
     pagination.pageSize,
   ]);
 
-  const virtualizer = enableRowVirtualization
-    ? useVirtual({
-        size: rows.length,
-        parentRef: tableContainerRef,
-        overscan: 15,
-        ...vProps,
-      })
-    : ({} as any);
-
-  if (virtualizerInstanceRef) {
-    virtualizerInstanceRef.current = virtualizer;
-  }
-
-  // const virtualizer: Virtualizer = enableRowVirtualization
-  //   ? useVirtualizer({
-  //       count: rows.length,
-  //       estimateSize: () => (density === 'compact' ? 25 : 50),
-  //       getScrollElement: () => tableContainerRef.current as HTMLDivElement,
+  // const virtualizer = enableRowVirtualization
+  //   ? useVirtual({
+  //       size: rows.length,
+  //       parentRef: tableContainerRef,
   //       overscan: 15,
   //       ...vProps,
   //     })
   //   : ({} as any);
 
-  const virtualRows = enableRowVirtualization ? virtualizer.virtualItems : [];
+  // if (virtualizerInstanceRef) {
+  //   virtualizerInstanceRef.current = virtualizer;
+  // }
 
-  // const virtualRows = enableRowVirtualization
-  //   ? virtualizer.getVirtualItems()
-  //   : [];
+  const virtualizer: Virtualizer<HTMLDivElement, Element> =
+    enableRowVirtualization
+      ? useVirtualizer({
+          count: rows.length,
+          // estimateSize: () => (density === 'compact' ? 25 : 50),
+          estimateSize: () => 50,
+          getScrollElement: () => tableContainerRef.current as HTMLDivElement,
+          overscan: 15,
+          ...vProps,
+        })
+      : ({} as any);
+
+  // const virtualRows = enableRowVirtualization ? virtualizer.virtualItems : [];
+
+  const virtualRows: VirtualItem[] = enableRowVirtualization
+    ? virtualizer.getVirtualItems()
+    : [];
 
   let paddingTop = 0;
   let paddingBottom = 0;
+  // if (enableRowVirtualization) {
+  //   paddingTop = virtualRows.length ? virtualRows[0].start : 0;
+  //   paddingBottom = virtualRows.length
+  //     ? virtualizer.totalSize - virtualRows[virtualRows.length - 1].end
+  //     : 0;
+  // }
   if (enableRowVirtualization) {
     paddingTop = virtualRows.length ? virtualRows[0].start : 0;
     paddingBottom = virtualRows.length
-      ? virtualizer.totalSize - virtualRows[virtualRows.length - 1].end
+      ? virtualizer.getTotalSize() - virtualRows[virtualRows.length - 1].end
       : 0;
   }
-  // if (enableRowVirtualization) {
-  //   paddingTop = !!virtualRows.length ? virtualRows[0].start : 0;
-  //   paddingBottom = !!virtualRows.length
-  //     ? virtualizer.getTotalSize() - virtualRows[virtualRows.length - 1].end
-  //     : 0;
-  // }
 
   return (
     <TableBody {...tableBodyProps}>
